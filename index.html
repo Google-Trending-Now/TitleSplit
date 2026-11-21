@@ -1,0 +1,2672 @@
+<!doctype html>
+<html lang="en-US" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Title Preview Tool — Side-by-Side A/B Title Tester</title>
+  <meta
+    name="description"
+    content="Test two YouTube titles side by side before you publish. Check desktop and mobile truncation, compare feed views, and pick a clearer title in seconds."
+  />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://titlesplit.app/youtube-title-preview-tool" id="canonical-link" />
+
+  <!-- Open Graph Metadata (US English) -->
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="TitleSplit" />
+  <meta property="og:title" content="YouTube Title Preview Tool — Side-by-Side A/B Title Tester" />
+  <meta
+    property="og:description"
+    content="Test two YouTube titles side by side before you publish. Check desktop and mobile truncation, compare feed views, and pick a clearer title in seconds."
+  />
+  <meta property="og:url" content="https://titlesplit.app/youtube-title-preview-tool" id="og-url-meta" />
+
+  <!-- Twitter / X Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="YouTube Title Preview Tool — Side-by-Side A/B Title Tester" />
+  <meta
+    name="twitter:description"
+    content="Compare Title A and Title B in realistic YouTube Home, Mobile, and Search feeds. Spot truncation before your video goes live."
+  />
+
+  <!-- Crisp Inline SVG Favicon: Play Button + A/B Split View -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f0f0f'/%3E%3Cpath d='M10 14h19v36H10a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z' fill='%23ff0033'/%3E%3Cpath d='M35 14h19a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H35V14z' fill='%23272727'/%3E%3Crect x='31' y='10' width='2' height='44' fill='%23ffffff' opacity='0.9'/%3E%3Cpolygon points='15,24 25,32 15,40' fill='%23ffffff'/%3E%3Ctext x='46.5' y='38' text-anchor='middle' font-family='Arial,sans-serif' font-size='18' font-weight='700' fill='%23f1f1f1'%3EB%3C/text%3E%3C/svg%3E"
+  />
+
+  <!-- Structured Data: WebApplication + FAQPage (Matches Visible Copy) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "YouTube Title Preview Tool by TitleSplit",
+          "url": "https://titlesplit.app/youtube-title-preview-tool",
+          "applicationCategory": "MultimediaApplication",
+          "operatingSystem": "All",
+          "inLanguage": "en-US",
+          "description": "Free browser-based YouTube title preview tool for comparing Title A and Title B side by side across Desktop Home, Mobile Feed, and Search layouts with live truncation checks.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Side-by-side Title A and Title B YouTube feed comparison",
+            "Desktop Home grid, Mobile feed, and Search / Up-Next preview modes",
+            "Dark Mode and Light Mode YouTube surface simulation",
+            "Live character count, word count, and mobile/desktop truncation warnings",
+            "Custom thumbnail upload preview with built-in fallback cards",
+            "Local browser history for saving and revisiting title pairs"
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How many characters show before a YouTube title gets cut off?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "YouTube lets you enter up to 100 characters, but most viewers never see all 100. On mobile Home feeds and narrow suggested rows, titles often start clipping around 55 to 60 characters. On desktop Home grids, you usually get around 65 to 70 characters across two lines before the ellipsis appears. Keeping your main hook inside the first 55 characters protects both views."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does this YouTube title preview tool upload my thumbnails to a server?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. Everything runs directly in your browser using the FileReader API and localStorage. Any thumbnail you pick stays on your device, and your saved title pairs remain stored only in your browser."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Should I test titles and thumbnails at the same time?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "If you want clean feedback before publishing, hold one variable steady first. Start with your strongest thumbnail and compare two different title angles—for example, curiosity versus a clear outcome. Once the wording reads cleanly without awkward line breaks, pair it with YouTube Studio's Test & Compare tool after upload."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why do shorter YouTube titles often earn higher click-through rates?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Viewers scroll fast, especially on phones. A 48-character title can be read in a single glance alongside the thumbnail, while a 90-character title forces extra effort and often hides the payoff behind three dots."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS & DUAL-THEME SYSTEM (60-30-10 YouTube-Authentic Palette)
+       ========================================================================== */
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+      /* Dark Theme (Default — YouTube Dark Surface) */
+      --bg-canvas: #0f0f0f;
+      --bg-surface: #181818;
+      --bg-surface-alt: #212121;
+      --bg-input: #121212;
+      --bg-hover: #272727;
+      --border-hairline: rgba(255, 255, 255, 0.11);
+      --border-strong: rgba(255, 255, 255, 0.22);
+
+      --text-primary: #f1f1f1;
+      --text-secondary: #aaaaaa;
+      --text-muted: #8a8a8a;
+
+      --accent: #ff0033;
+      --accent-hover: #e0002d;
+      --accent-text: #ffffff;
+      --accent-soft: rgba(255, 0, 51, 0.14);
+
+      --status-safe: #34d399;
+      --status-safe-bg: rgba(52, 211, 153, 0.12);
+      --status-warn: #fbbf24;
+      --status-warn-bg: rgba(251, 191, 36, 0.14);
+      --status-danger: #f87171;
+      --status-danger-bg: rgba(248, 113, 113, 0.16);
+
+      --yt-canvas: #0f0f0f;
+      --yt-title: #f1f1f1;
+      --yt-meta: #aaaaaa;
+      --yt-chip-bg: #272727;
+      --yt-avatar-bg: #2e2e2e;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 12px;
+
+      --container-max: 1240px;
+      --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      --focus-ring: 0 0 0 2px var(--bg-canvas), 0 0 0 4px #3ea6ff;
+    }
+
+    html[data-theme="light"] {
+      --bg-canvas: #ffffff;
+      --bg-surface: #f8f8f8;
+      --bg-surface-alt: #f0f0f0;
+      --bg-input: #ffffff;
+      --bg-hover: #e9e9e9;
+      --border-hairline: rgba(15, 15, 15, 0.10);
+      --border-strong: rgba(15, 15, 15, 0.22);
+
+      --text-primary: #0f0f0f;
+      --text-secondary: #525252;
+      --text-muted: #6b6b6b;
+
+      --accent: #cc0000;
+      --accent-hover: #a80000;
+      --accent-text: #ffffff;
+      --accent-soft: rgba(204, 0, 0, 0.08);
+
+      --status-safe: #15803d;
+      --status-safe-bg: rgba(21, 128, 61, 0.10);
+      --status-warn: #b45309;
+      --status-warn-bg: rgba(180, 83, 9, 0.12);
+      --status-danger: #b91c1c;
+      --status-danger-bg: rgba(185, 28, 28, 0.12);
+
+      --yt-canvas: #ffffff;
+      --yt-title: #0f0f0f;
+      --yt-meta: #606060;
+      --yt-chip-bg: #f2f2f2;
+      --yt-avatar-bg: #e5e5e5;
+      --seg-track: #efefef;
+      --seg-active: #ffffff;
+
+      --focus-ring: 0 0 0 2px var(--bg-canvas), 0 0 0 4px #065fd4;
+    }
+
+    html[data-theme="dark"] {
+      --seg-track: #181818;
+      --seg-active: #2b2b2b;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ==========================================================================
+       2. RESET, ACCESSIBILITY & BASE TYPOGRAPHY
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-canvas);
+      letter-spacing: 0.005em;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 16px;
+      top: -64px;
+      padding: 10px 16px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 12px;
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-mono);
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ==========================================================================
+       3. TOP NAVIGATION BAR (Strict 3-Zone Contract)
+       ========================================================================== */
+    .site-header {
+      border-bottom: 1px solid var(--border-hairline);
+      background-color: var(--bg-canvas);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      height: 64px;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .brand-icon {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .primary-nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .primary-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 6px 0;
+      border-bottom: 1.5px solid transparent;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .primary-nav a:hover {
+      color: var(--text-primary);
+      border-bottom-color: var(--border-strong);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-strong);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-text);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .btn-subtle {
+      background: transparent;
+      border-color: var(--border-hairline);
+      color: var(--text-secondary);
+    }
+
+    .btn-subtle:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-alt);
+    }
+
+    .btn-sm {
+      min-height: 36px;
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    /* ==========================================================================
+       4. HERO INTRO (Concise, Utility-First)
+       ========================================================================== */
+    .hero {
+      padding: 20px 0 14px;
+    }
+
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.5rem, 2.5vw, 2.05rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      font-weight: 700;
+      text-wrap: balance;
+      max-width: 28ch;
+    }
+
+    .hero-lead {
+      margin: 0;
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      max-width: 78ch;
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       5. INTERACTIVE WORKSPACE TOOLBAR & CONTROLS
+       ========================================================================== */
+    .workspace {
+      padding-bottom: 44px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      margin-bottom: 14px;
+      border-top: 1px solid var(--border-hairline);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .segmented {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px;
+      background: var(--seg-track);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+    }
+
+    .segmented button {
+      min-height: 32px;
+      padding: 5px 12px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .segmented button:hover {
+      color: var(--text-primary);
+    }
+
+    .segmented button[aria-pressed="true"] {
+      background: var(--seg-active);
+      color: var(--text-primary);
+      box-shadow: inset 0 0 0 1px var(--border-strong);
+    }
+
+    /* ==========================================================================
+       6. COMPOSER GRID (Title A & Title B Side by Side + Shared Settings)
+       ========================================================================== */
+    .composer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .variant-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .variant-panel.is-winner {
+      border-color: var(--accent);
+    }
+
+    .variant-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .variant-label-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .variant-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .winner-indicator {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .variant-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .winner-pick-btn {
+      min-height: 32px;
+      padding: 4px 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-hairline);
+      background: transparent;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .winner-pick-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .winner-pick-btn[aria-pressed="true"] {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .title-input {
+      width: 100%;
+      min-height: 54px;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.4;
+      resize: vertical;
+      transition: border-color var(--transition-fast);
+    }
+
+    .title-input:hover {
+      border-color: var(--border-strong);
+    }
+
+    .title-input:focus {
+      border-color: #3ea6ff;
+    }
+
+    .title-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Clean Unboxed Metrics Row (Zero-Pill Discipline) */
+    .metrics-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .metrics-counts {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .metric-sep {
+      color: var(--text-muted);
+      user-select: none;
+    }
+
+    .truncation-status {
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+
+    .truncation-status.safe { color: var(--status-safe); }
+    .truncation-status.warn { color: var(--status-warn); }
+    .truncation-status.danger { color: var(--status-danger); }
+    .truncation-status.empty { color: var(--text-muted); }
+
+    /* Visual Cutoff Strip */
+    .cutoff-strip {
+      padding-top: 10px;
+      border-top: 1px solid var(--border-hairline);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .cutoff-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cutoff-text {
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    .cutoff-text .zone-mobile-risk {
+      background: var(--status-warn-bg);
+      color: var(--status-warn);
+      border-bottom: 1.5px solid var(--status-warn);
+      padding: 0 1px;
+    }
+
+    .cutoff-text .zone-desktop-cut {
+      background: var(--status-danger-bg);
+      color: var(--status-danger);
+      text-decoration: line-through;
+      padding: 0 1px;
+    }
+
+    /* Quick Creator Checklist & Curiosity Words (Clean Hairline List) */
+    .helper-details {
+      padding-top: 10px;
+      border-top: 1px solid var(--border-hairline);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .power-words-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .power-word-hit {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-underline-offset: 3px;
+    }
+
+    .checklist-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+    }
+
+    .check-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-muted);
+    }
+
+    .check-item.is-pass {
+      color: var(--text-primary);
+    }
+
+    .check-mark {
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .check-item.is-pass .check-mark {
+      color: var(--status-safe);
+    }
+
+    /* Shared Channel & Thumbnail Settings Row */
+    .shared-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 0.85fr 0.85fr 1.35fr;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .field input[type="text"] {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .field input[type="text"]:hover {
+      border-color: var(--border-strong);
+    }
+
+    .thumb-upload-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .thumb-file-label {
+      flex: 1;
+      min-height: 40px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-strong);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .thumb-file-label:hover {
+      background: var(--bg-hover);
+    }
+
+    .thumb-file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       7. LIVE YOUTUBE FEED PREVIEW STAGE
+       ========================================================================== */
+    .preview-stage {
+      background: var(--yt-canvas);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      margin-bottom: 0;
+    }
+
+    .preview-stage-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .preview-stage-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--yt-title);
+    }
+
+    .preview-stage-note {
+      font-size: 13px;
+      color: var(--yt-meta);
+    }
+
+    /* View Mode 1: Desktop Home / Browse Grid */
+    .feed-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 420px));
+      justify-content: center;
+      gap: 28px;
+    }
+
+    .yt-card-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .yt-slot-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--yt-meta);
+      font-weight: 600;
+    }
+
+    .yt-slot-kicker .slot-winner-note {
+      color: var(--accent);
+    }
+
+    .yt-video-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .yt-thumb-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #1f1f1f;
+      flex-shrink: 0;
+    }
+
+    .yt-thumb-box img,
+    .yt-thumb-box svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .yt-duration {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.84);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.25;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .yt-meta-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .yt-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--yt-avatar-bg);
+      color: var(--yt-title);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .yt-text-col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .yt-title-render {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.38;
+      color: var(--yt-title);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .yt-title-render.is-placeholder {
+      color: var(--yt-meta);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .yt-channel-line,
+    .yt-stats-line {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.4;
+      color: var(--yt-meta);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .yt-kebab {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--yt-title);
+      opacity: 0.72;
+      flex-shrink: 0;
+    }
+
+    .yt-search-snippet {
+      display: none;
+      margin: 10px 0 0;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--yt-meta);
+    }
+
+    /* View Mode 2: Mobile Feed Simulation */
+    .preview-stage[data-view="mobile"] .feed-grid {
+      grid-template-columns: repeat(2, minmax(0, 360px));
+      gap: 28px;
+    }
+
+    .preview-stage[data-view="mobile"] .yt-video-card {
+      border: 1px solid var(--border-hairline);
+      border-radius: 14px;
+      padding: 0 0 14px;
+      background: var(--yt-canvas);
+      overflow: hidden;
+    }
+
+    .preview-stage[data-view="mobile"] .yt-thumb-box {
+      border-radius: 0;
+    }
+
+    .preview-stage[data-view="mobile"] .yt-meta-row {
+      padding: 0 12px;
+      gap: 10px;
+    }
+
+    .preview-stage[data-view="mobile"] .yt-title-render {
+      font-size: 14.5px;
+      line-height: 1.35;
+    }
+
+    .preview-stage[data-view="mobile"] .yt-channel-line,
+    .preview-stage[data-view="mobile"] .yt-stats-line {
+      font-size: 12px;
+    }
+
+    /* View Mode 3: Search / Up-Next Row */
+    .preview-stage[data-view="search"] .feed-grid {
+      grid-template-columns: minmax(0, 860px);
+      gap: 20px;
+    }
+
+    .preview-stage[data-view="search"] .yt-video-card {
+      flex-direction: row;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .preview-stage[data-view="search"] .yt-thumb-box {
+      width: 320px;
+      flex-shrink: 0;
+    }
+
+    .preview-stage[data-view="search"] .yt-meta-row {
+      flex: 1;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .preview-stage[data-view="search"] .yt-avatar {
+      width: 24px;
+      height: 24px;
+      font-size: 10.5px;
+    }
+
+    .preview-stage[data-view="search"] .yt-title-render {
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .preview-stage[data-view="search"] .yt-search-snippet {
+      display: block;
+    }
+
+    .preview-stage[data-view="search"] .yt-kebab {
+      display: none;
+    }
+
+    .search-channel-inline {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .preview-stage[data-view="search"] .search-channel-inline {
+      display: flex;
+    }
+
+    .preview-stage[data-view="search"] .desktop-avatar-slot,
+    .preview-stage[data-view="search"] .desktop-channel-only {
+      display: none;
+    }
+
+    /* Quick Action Strip Below Preview */
+    .stage-footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .stage-status-msg {
+      font-size: 13px;
+      color: var(--text-secondary);
+      min-height: 20px;
+    }
+
+    .stage-status-msg.is-confirmed {
+      color: var(--status-safe);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       8. SAVED HISTORY SECTION (localStorage)
+       ========================================================================== */
+    .section-block {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
+    .section-sub {
+      margin: 4px 0 0;
+      font-size: 14.5px;
+      color: var(--text-secondary);
+    }
+
+    .saved-list {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .saved-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .saved-titles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+
+    .saved-variant {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .saved-variant strong {
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .saved-meta {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .saved-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .empty-state {
+      padding: 28px 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .empty-state p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 14.5px;
+    }
+
+    /* ==========================================================================
+       9. CREATOR GUIDE, TRUNCATION TABLE & FAQ (SEO Copy)
+       ========================================================================== */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
+      margin-top: 20px;
+    }
+
+    .guide-col h3 {
+      margin: 0 0 8px;
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .guide-col p {
+      margin: 0;
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      line-height: 1.62;
+    }
+
+    .limits-table-wrap {
+      margin-top: 28px;
+      overflow-x: auto;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+    }
+
+    .limits-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .limits-table th,
+    .limits-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .limits-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .limits-table th {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .limits-table td.num {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .faq-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 36px;
+      margin-top: 20px;
+    }
+
+    .faq-item h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .faq-item p {
+      margin: 0;
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      line-height: 1.62;
+    }
+
+    /* ==========================================================================
+       10. FOOTER
+       ========================================================================== */
+    .site-footer {
+      border-top: 1px solid var(--border-hairline);
+      padding: 28px 0 40px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-links a,
+    .footer-links .footer-action-btn {
+      color: var(--text-secondary);
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .footer-links a:hover,
+    .footer-links .footer-action-btn:hover {
+      color: var(--text-primary);
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       11. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .shared-bar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .shared-bar .thumb-field {
+        grid-column: 1 / -1;
+      }
+      .guide-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .primary-nav {
+        display: none;
+      }
+      .composer-grid {
+        grid-template-columns: 1fr;
+      }
+      .feed-grid,
+      .preview-stage[data-view="mobile"] .feed-grid {
+        grid-template-columns: 1fr;
+      }
+      .preview-stage[data-view="search"] .yt-video-card {
+        flex-direction: column;
+      }
+      .preview-stage[data-view="search"] .yt-thumb-box {
+        width: 100%;
+      }
+      .saved-titles,
+      .faq-list {
+        grid-template-columns: 1fr;
+      }
+      .saved-item {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        padding: 0 16px;
+      }
+      .header-inner {
+        height: 58px;
+        gap: 12px;
+      }
+      .hero {
+        padding: 24px 0 18px;
+      }
+      .shared-bar {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+      .preview-stage {
+        padding: 16px;
+      }
+      .btn {
+        min-height: 44px;
+      }
+      .segmented {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .segmented button {
+        flex: 1;
+        min-height: 38px;
+        padding: 6px 8px;
+        font-size: 12.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#previewer" class="skip-link">Skip to YouTube title previewer</a>
+
+  <!-- Header: Strict 3-Zone Top Bar -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#previewer" class="brand-link" aria-label="TitleSplit YouTube Title Preview Tool Home">
+        <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#181818" />
+          <path d="M10 14h19v36H10a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" fill="#ff0033" />
+          <path d="M35 14h19a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H35V14z" fill="#2b2b2b" />
+          <rect x="31" y="10" width="2" height="44" fill="#ffffff" opacity="0.9" />
+          <polygon points="15,24 25,32 15,40" fill="#ffffff" />
+          <text x="46.5" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#f1f1f1">B</text>
+        </svg>
+        <span>TitleSplit</span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <a href="#previewer">Previewer</a>
+        <a href="#saved-tests">Saved Tests</a>
+        <a href="#truncation-guide">Cutoff Guide</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <button type="button" class="btn" id="header-sample-btn">
+        Load Sample Test
+      </button>
+    </div>
+  </header>
+
+  <main id="previewer">
+    <!-- Hero Intro -->
+    <section class="hero">
+      <div class="container">
+        <h1>YouTube Title Preview Tool</h1>
+        <p class="hero-lead">
+          Put two title ideas side by side before you hit publish. Spot where desktop and phone feeds cut off your hook, test how your wording pairs with your thumbnail, and save your strongest pairs for upload day.
+        </p>
+      </div>
+    </section>
+
+    <!-- Core A/B Workspace -->
+    <section class="workspace" aria-label="YouTube Title A/B Previewer Workspace">
+      <div class="container">
+        <!-- Workspace Controls Toolbar -->
+        <div class="toolbar">
+          <div class="toolbar-group">
+            <div class="segmented" role="group" aria-label="YouTube feed view mode">
+              <button type="button" data-view-btn="desktop" aria-pressed="true">Desktop Grid</button>
+              <button type="button" data-view-btn="mobile" aria-pressed="false">Mobile Feed</button>
+              <button type="button" data-view-btn="search" aria-pressed="false">Search / Up-Next</button>
+            </div>
+
+            <div class="segmented" role="group" aria-label="YouTube color theme">
+              <button type="button" data-theme-btn="dark" aria-pressed="true">Dark Mode</button>
+              <button type="button" data-theme-btn="light" aria-pressed="false">Light Mode</button>
+            </div>
+          </div>
+
+          <div class="toolbar-group">
+            <button type="button" class="btn btn-sm" id="swap-btn">Swap A &amp; B</button>
+            <button type="button" class="btn btn-sm" id="save-pair-btn">Save Pair</button>
+            <button type="button" class="btn btn-primary btn-sm" id="copy-winner-btn">Copy Winner (A)</button>
+          </div>
+        </div>
+
+        <!-- Side-by-Side Title A & Title B Inputs -->
+        <div class="composer-grid">
+          <!-- Title A Panel -->
+          <div class="variant-panel is-winner" id="panel-a">
+            <div class="variant-header">
+              <div class="variant-label-wrap">
+                <label class="variant-label" for="input-title-a">Title A</label>
+                <span class="winner-indicator" id="winner-tag-a">Selected winner</span>
+              </div>
+              <div class="variant-actions">
+                <button type="button" class="winner-pick-btn" id="pick-a-btn" aria-pressed="true">Pick A</button>
+              </div>
+            </div>
+
+            <textarea
+              id="input-title-a"
+              class="title-input"
+              maxlength="120"
+              rows="2"
+              placeholder="Write your first title idea (aim for 45–60 characters)..."
+            ></textarea>
+
+            <div class="metrics-bar">
+              <div class="metrics-counts">
+                <span><strong class="tabular" id="chars-a">0</strong> chars</span>
+                <span class="metric-sep" aria-hidden="true">&middot;</span>
+                <span><strong class="tabular" id="words-a">0</strong> words</span>
+              </div>
+              <span class="truncation-status safe" id="status-a">Fits mobile &amp; desktop</span>
+            </div>
+
+            <div class="cutoff-strip" aria-live="polite">
+              <div class="cutoff-label">
+                <span>Truncation check</span>
+                <span class="tabular">55 mob &middot; 68 desk</span>
+              </div>
+              <div class="cutoff-text" id="cutoff-a"></div>
+            </div>
+
+            <div class="helper-details">
+              <div class="power-words-line" id="power-a"></div>
+              <div class="checklist-row" id="checks-a"></div>
+            </div>
+          </div>
+
+          <!-- Title B Panel -->
+          <div class="variant-panel" id="panel-b">
+            <div class="variant-header">
+              <div class="variant-label-wrap">
+                <label class="variant-label" for="input-title-b">Title B</label>
+                <span class="winner-indicator" id="winner-tag-b" hidden>Selected winner</span>
+              </div>
+              <div class="variant-actions">
+                <button type="button" class="winner-pick-btn" id="pick-b-btn" aria-pressed="false">Pick B</button>
+              </div>
+            </div>
+
+            <textarea
+              id="input-title-b"
+              class="title-input"
+              maxlength="120"
+              rows="2"
+              placeholder="Write a second angle to test against Title A..."
+            ></textarea>
+
+            <div class="metrics-bar">
+              <div class="metrics-counts">
+                <span><strong class="tabular" id="chars-b">0</strong> chars</span>
+                <span class="metric-sep" aria-hidden="true">&middot;</span>
+                <span><strong class="tabular" id="words-b">0</strong> words</span>
+              </div>
+              <span class="truncation-status safe" id="status-b">Fits mobile &amp; desktop</span>
+            </div>
+
+            <div class="cutoff-strip" aria-live="polite">
+              <div class="cutoff-label">
+                <span>Truncation check</span>
+                <span class="tabular">55 mob &middot; 68 desk</span>
+              </div>
+              <div class="cutoff-text" id="cutoff-b"></div>
+            </div>
+
+            <div class="helper-details">
+              <div class="power-words-line" id="power-b"></div>
+              <div class="checklist-row" id="checks-b"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live YouTube Feed Preview Stage (Placed right below inputs for immediate above-the-fold comparison) -->
+        <div class="preview-stage" id="preview-stage" data-view="desktop" data-testid="preview-stage">
+          <div class="preview-stage-head">
+            <h2 class="preview-stage-title" id="stage-heading">Desktop Home Feed Preview</h2>
+            <span class="preview-stage-note" id="stage-note">
+              Simulated at realistic 2-line YouTube browse width &middot; <span id="stage-subs-display">148K subscribers</span>
+            </span>
+          </div>
+
+          <div class="feed-grid">
+            <!-- Card A -->
+            <article class="yt-card-wrap" aria-label="Preview for Title A">
+              <div class="yt-slot-kicker">
+                <span>Option A</span>
+                <span class="slot-winner-note" id="preview-winner-a">Current winner</span>
+              </div>
+
+              <div class="yt-video-card">
+                <div class="yt-thumb-box" id="thumb-slot-a">
+                  <!-- Populated by JS with uploaded image or clean fallback SVG -->
+                  <span class="yt-duration" id="duration-a">14:28</span>
+                </div>
+
+                <div class="yt-meta-row">
+                  <div class="yt-avatar desktop-avatar-slot" id="avatar-a" aria-hidden="true">NW</div>
+                  <div class="yt-text-col">
+                    <h3 class="yt-title-render" id="preview-title-a"></h3>
+                    <p class="yt-channel-line desktop-channel-only" id="preview-channel-a"></p>
+                    <p class="yt-stats-line" id="preview-stats-a"></p>
+                    <div class="search-channel-inline">
+                      <div class="yt-avatar" id="avatar-search-a" aria-hidden="true">NW</div>
+                      <span class="yt-channel-line" id="preview-search-channel-a"></span>
+                    </div>
+                    <p class="yt-search-snippet" id="preview-snippet-a"></p>
+                  </div>
+                  <div class="yt-kebab" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="5" r="1.8" />
+                      <circle cx="12" cy="12" r="1.8" />
+                      <circle cx="12" cy="19" r="1.8" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Card B -->
+            <article class="yt-card-wrap" aria-label="Preview for Title B">
+              <div class="yt-slot-kicker">
+                <span>Option B</span>
+                <span class="slot-winner-note" id="preview-winner-b" hidden>Current winner</span>
+              </div>
+
+              <div class="yt-video-card">
+                <div class="yt-thumb-box" id="thumb-slot-b">
+                  <span class="yt-duration" id="duration-b">14:28</span>
+                </div>
+
+                <div class="yt-meta-row">
+                  <div class="yt-avatar desktop-avatar-slot" id="avatar-b" aria-hidden="true">NW</div>
+                  <div class="yt-text-col">
+                    <h3 class="yt-title-render" id="preview-title-b"></h3>
+                    <p class="yt-channel-line desktop-channel-only" id="preview-channel-b"></p>
+                    <p class="yt-stats-line" id="preview-stats-b"></p>
+                    <div class="search-channel-inline">
+                      <div class="yt-avatar" id="avatar-search-b" aria-hidden="true">NW</div>
+                      <span class="yt-channel-line" id="preview-search-channel-b"></span>
+                    </div>
+                    <p class="yt-search-snippet" id="preview-snippet-b"></p>
+                  </div>
+                  <div class="yt-kebab" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="5" r="1.8" />
+                      <circle cx="12" cy="12" r="1.8" />
+                      <circle cx="12" cy="19" r="1.8" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="stage-footer-actions">
+            <div class="stage-status-msg" id="action-status" role="status" aria-live="polite">
+              Tip: Switch between Desktop Grid and Mobile Feed to see if your main point survives phone truncation.
+            </div>
+            <button type="button" class="btn btn-subtle btn-sm" id="stage-sample-btn">
+              Try Another Niche Example
+            </button>
+          </div>
+        </div>
+
+        <!-- Shared Channel Metadata & Custom Thumbnail Upload -->
+        <div class="shared-bar" aria-label="Shared video and channel settings">
+          <div class="field">
+            <label for="input-channel">Channel name</label>
+            <input type="text" id="input-channel" maxlength="60" placeholder="e.g., Nate's Workshop" />
+          </div>
+
+          <div class="field">
+            <label for="input-subs">Subscribers</label>
+            <input type="text" id="input-subs" maxlength="32" placeholder="e.g., 148K subscribers" />
+          </div>
+
+          <div class="field">
+            <label for="input-views">Views</label>
+            <input type="text" id="input-views" maxlength="24" placeholder="e.g., 42K views" />
+          </div>
+
+          <div class="field">
+            <label for="input-time">Upload time</label>
+            <input type="text" id="input-time" maxlength="24" placeholder="e.g., 2 hours ago" />
+          </div>
+
+          <div class="field thumb-field">
+            <label for="input-thumb">Thumbnail (16:9 optional)</label>
+            <div class="thumb-upload-wrap">
+              <label for="input-thumb" class="thumb-file-label" id="thumb-upload-label">
+                Upload thumbnail
+              </label>
+              <input
+                type="file"
+                id="input-thumb"
+                class="thumb-file-input"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+              />
+              <button type="button" class="btn btn-subtle btn-sm" id="reset-thumb-btn" hidden>
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Saved Recent Title Pairs (localStorage) -->
+    <section class="section-block" id="saved-tests" aria-labelledby="saved-heading">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2 id="saved-heading">Recent Saved Tests</h2>
+            <p class="section-sub">Stored locally in your browser so you can come back to strong title pairs later.</p>
+          </div>
+          <button type="button" class="btn btn-subtle btn-sm" id="clear-saved-btn" hidden>
+            Clear All Saved
+          </button>
+        </div>
+
+        <div id="saved-list-container" data-testid="saved-list"></div>
+      </div>
+    </section>
+
+    <!-- Practical Creator Guide & Truncation Reference -->
+    <section class="section-block" id="truncation-guide" aria-labelledby="guide-heading">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2 id="guide-heading">How to Use This YouTube Title Preview Tool Before Publishing</h2>
+            <p class="section-sub">A quick workflow most working channels use to catch weak phrasing before upload day.</p>
+          </div>
+        </div>
+
+        <div class="guide-grid">
+          <article class="guide-col">
+            <h3>1. Front-load the hook</h3>
+            <p>
+              Over half of YouTube watch time in the US happens on phones and TVs. Put the tension, number, or clear outcome in the first 45 to 55 characters so nothing vital disappears behind three dots.
+            </p>
+          </article>
+
+          <article class="guide-col">
+            <h3>2. Pair the title with the thumbnail</h3>
+            <p>
+              Don't repeat the exact same words on both. If your thumbnail already says "$400 Budget," let the title carry the story—like what went wrong or what you actually built with that budget.
+            </p>
+          </article>
+
+          <article class="guide-col">
+            <h3>3. Test two different angles, not tiny word swaps</h3>
+            <p>
+              Changing "Best" to "Top" rarely moves click-through rate. Put a direct how-to title in Box A and a curiosity-driven story angle in Box B, then judge which one makes you stop scrolling.
+            </p>
+          </article>
+        </div>
+
+        <div class="limits-table-wrap">
+          <table class="limits-table" aria-label="YouTube title character limits by feed surface">
+            <thead>
+              <tr>
+                <th scope="col">YouTube Surface</th>
+                <th scope="col">Typical Visible Length</th>
+                <th scope="col">What Viewers Actually See</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mobile Home &amp; Subscriptions</td>
+                <td class="num">50–58 chars</td>
+                <td>Two tight lines under a full-width thumbnail; long intros get clipped fast.</td>
+              </tr>
+              <tr>
+                <td>Desktop Home Grid</td>
+                <td class="num">62–70 chars</td>
+                <td>Two lines beside your channel avatar; usually your safest visual check.</td>
+              </tr>
+              <tr>
+                <td>Search Results &amp; Up-Next</td>
+                <td class="num">60–72 chars</td>
+                <td>Horizontal row where clarity and exact search terms stand out right away.</td>
+              </tr>
+              <tr>
+                <td>YouTube Studio Hard Limit</td>
+                <td class="num">100 chars max</td>
+                <td>Allowed by YouTube, but the last 30 characters almost never show in browse feeds.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section (Exact Match to FAQPage JSON-LD) -->
+    <section class="section-block" id="faq" aria-labelledby="faq-heading">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2 id="faq-heading">Common Questions About YouTube Title Previews</h2>
+            <p class="section-sub">Straight answers on truncation limits, privacy, and A/B testing habits.</p>
+          </div>
+        </div>
+
+        <div class="faq-list">
+          <article class="faq-item">
+            <h3>How many characters show before a YouTube title gets cut off?</h3>
+            <p>
+              YouTube lets you enter up to 100 characters, but most viewers never see all 100. On mobile Home feeds and narrow suggested rows, titles often start clipping around 55 to 60 characters. On desktop Home grids, you usually get around 65 to 70 characters across two lines before the ellipsis appears. Keeping your main hook inside the first 55 characters protects both views.
+            </p>
+          </article>
+
+          <article class="faq-item">
+            <h3>Does this YouTube title preview tool upload my thumbnails to a server?</h3>
+            <p>
+              No. Everything runs directly in your browser using the FileReader API and localStorage. Any thumbnail you pick stays on your device, and your saved title pairs remain stored only in your browser.
+            </p>
+          </article>
+
+          <article class="faq-item">
+            <h3>Should I test titles and thumbnails at the same time?</h3>
+            <p>
+              If you want clean feedback before publishing, hold one variable steady first. Start with your strongest thumbnail and compare two different title angles—for example, curiosity versus a clear outcome. Once the wording reads cleanly without awkward line breaks, pair it with YouTube Studio's Test &amp; Compare tool after upload.
+            </p>
+          </article>
+
+          <article class="faq-item">
+            <h3>Why do shorter YouTube titles often earn higher click-through rates?</h3>
+            <p>
+              Viewers scroll fast, especially on phones. A 48-character title can be read in a single glance alongside the thumbnail, while a 90-character title forces extra effort and often hides the payoff behind three dots.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p style="margin: 0;">TitleSplit &mdash; Free YouTube title preview tool built for creators. Runs 100% locally in your browser.</p>
+      <div class="footer-links">
+        <a href="#previewer">Back to top</a>
+        <a href="#saved-tests">Saved Tests</a>
+        <a href="#truncation-guide">Cutoff Guide</a>
+        <a href="#faq">FAQ</a>
+        <button type="button" class="footer-action-btn" id="download-html-btn">Download .html</button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ========================================================================
+       YOUTUBE TITLE A/B PREVIEWER — PURE LOGIC & BROWSER CONTROLLER
+       Zero external dependencies. Pure helper functions sit at the top so
+       unit tests can verify them directly without DOM coupling.
+       ======================================================================== */
+
+    const MOBILE_CUTOFF = 55;
+    const DESKTOP_CUTOFF = 68;
+    const STORAGE_KEY = 'titlesplit_saved_pairs_v1';
+    const THEME_KEY = 'titlesplit_theme_v1';
+    const MAX_SAVED_PAIRS = 12;
+
+    // Practical power & curiosity words commonly found in strong US YouTube titles
+    const POWER_WORDS = new Set([
+      'why', 'how', 'stop', 'never', 'truth', 'mistake', 'mistakes', 'secret',
+      'tested', 'tried', 'honest', 'worth', 'real', 'actually', 'wrong', 'broken',
+      'cheap', 'free', 'budget', 'quit', 'failed', 'fixed', 'built', 'bought',
+      'hidden', 'avoid', 'worse', 'better', 'fastest', 'easiest', 'simple',
+      'only', 'every', 'nobody', 'everyone', 'changed', 'ruined', 'saved',
+      'first', 'last', 'before', 'after', 'without', 'instead', 'warning'
+    ]);
+
+    // Realistic US creator presets across distinct niches (with clean SVG fallback art)
+    const SAMPLE_PRESETS = [
+      {
+        niche: 'Tech & Desk Setup',
+        titleA: 'I Used a $199 Used ThinkPad for 30 Days — Honest Review',
+        titleB: 'Why I Ditched My $2,800 MacBook Pro for a $199 Used Laptop from eBay (30-Day Experiment)',
+        channel: 'Nate Builds Tech',
+        subscribers: '148K subscribers',
+        views: '64K views',
+        uploadTime: '3 hours ago',
+        duration: '14:28',
+        snippet: 'After a month of editing, coding, and traveling on a beat-up $199 ThinkPad T480, here is what held up and what drove me crazy.',
+        thumbLabel: '$199 vs $2,800',
+        thumbSub: '30 DAYS LATER',
+        thumbPalette: ['#152238', '#23395d', '#f59e0b']
+      },
+      {
+        niche: 'Personal Finance (US)',
+        titleA: 'How a $75,000 Salary Actually Feels in Austin Right Now',
+        titleB: 'Living on $75K a Year in Texas: Real Rent, Groceries, Car Insurance & Monthly Savings Breakdown',
+        channel: 'Plain Dollar',
+        subscribers: '312K subscribers',
+        views: '118K views',
+        uploadTime: '5 hours ago',
+        duration: '11:42',
+        snippet: 'No fake spreadsheet math. Every paycheck deduction, apartment bill, and grocery receipt from a normal month in Austin.',
+        thumbLabel: '$75,000 / YR',
+        thumbSub: 'REAL BUDGET',
+        thumbPalette: ['#102a22', '#1b4332', '#34d399']
+      },
+      {
+        niche: 'YouTube Creator Strategy',
+        titleA: 'Stop Writing 80-Character YouTube Titles (Here Is Why)',
+        titleB: 'We Audited 500 Small Channels and Found the One Title Mistake Killing Click-Through Rate',
+        channel: 'Frame & Hook',
+        subscribers: '89.4K subscribers',
+        views: '27K views',
+        uploadTime: '2 hours ago',
+        duration: '9:16',
+        snippet: 'When viewers scroll on their phones, the last 25 characters of your title usually vanish. Here is how to restructure your hook.',
+        thumbLabel: 'CTR +3.4%',
+        thumbSub: 'TITLE FIX',
+        thumbPalette: ['#2b1218', '#521b27', '#ff3b5c']
+      },
+      {
+        niche: 'Home & DIY',
+        titleA: 'We Renovated a 1978 Kitchen for $3,200 Without Contractors',
+        titleB: 'DIY Kitchen Makeover on a Tight Budget: Painting Oak Cabinets, New Countertops & Honest Costs',
+        channel: 'Saturday Garage',
+        subscribers: '420K subscribers',
+        views: '205K views',
+        uploadTime: '1 day ago',
+        duration: '18:05',
+        snippet: 'Four weekends, two tired homeowners, and every receipt from Home Depot laid out at the end of the video.',
+        thumbLabel: '$3,200 DIY',
+        thumbSub: 'BEFORE / AFTER',
+        thumbPalette: ['#26211b', '#443a2e', '#fbbf24']
+      }
+    ];
+
+    /**
+     * Escapes text safely for HTML insertion.
+     */
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Extracts up to 2 initials from a channel name for the YouTube avatar circle.
+     */
+    function getChannelInitials(name) {
+      const cleaned = String(name || '').trim();
+      if (!cleaned) return 'YT';
+      const parts = cleaned.split(/\s+/).filter(Boolean);
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    /**
+     * Detects unique power/curiosity words present in a title.
+     */
+    function detectPowerWords(title) {
+      const tokens = String(title || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9'\s-]/g, ' ')
+        .split(/\s+/)
+        .filter(Boolean);
+      const found = [];
+      const seen = new Set();
+      for (const word of tokens) {
+        if (POWER_WORDS.has(word) && !seen.has(word)) {
+          seen.add(word);
+          found.push(word);
+        }
+      }
+      return found;
+    }
+
+    /**
+     * Evaluates character count, word count, truncation risk, and practical title checks.
+     */
+    function analyzeTitle(rawTitle) {
+      const text = String(rawTitle || '').trim();
+      const charCount = text.length;
+      const words = text ? text.split(/\s+/).filter(Boolean) : [];
+      const wordCount = words.length;
+      const powerWords = detectPowerWords(text);
+
+      let level = 'empty';
+      let label = 'Type a title to check truncation';
+
+      if (charCount > 0 && charCount <= MOBILE_CUTOFF) {
+        level = 'safe';
+        label = 'Safe on mobile & desktop';
+      } else if (charCount > MOBILE_CUTOFF && charCount <= DESKTOP_CUTOFF) {
+        level = 'warn';
+        label = 'May clip on phones (55+ chars)';
+      } else if (charCount > DESKTOP_CUTOFF) {
+        level = 'danger';
+        label = 'Likely cut off on desktop & mobile';
+      }
+
+      // Check for excessive ALL-CAPS shouting (more than 2 long uppercase words)
+      const allCapsWords = words.filter((w) => {
+        const lettersOnly = w.replace(/[^A-Za-z]/g, '');
+        return lettersOnly.length >= 4 && lettersOnly === lettersOnly.toUpperCase();
+      });
+
+      const hasNumber = /\d/.test(text);
+      const frontLoaded = charCount > 0 && charCount <= DESKTOP_CUTOFF;
+      const noCapsSpam = charCount > 0 && allCapsWords.length <= 1;
+
+      const safePart = text.slice(0, MOBILE_CUTOFF);
+      const mobileRiskPart = text.slice(MOBILE_CUTOFF, DESKTOP_CUTOFF);
+      const desktopCutPart = text.slice(DESKTOP_CUTOFF);
+
+      return {
+        text,
+        charCount,
+        wordCount,
+        level,
+        label,
+        powerWords,
+        safePart,
+        mobileRiskPart,
+        desktopCutPart,
+        checks: {
+          frontLoaded,
+          hasNumber,
+          hasPowerWord: powerWords.length > 0,
+          noCapsSpam
+        }
+      };
+    }
+
+    /**
+     * Generates a clean, zero-dependency 16:9 SVG thumbnail fallback card.
+     */
+    function buildFallbackThumbnailSvg(preset) {
+      const p = preset || SAMPLE_PRESETS[0];
+      const [c1, c2, accent] = p.thumbPalette;
+      const label = escapeHtml(p.thumbLabel);
+      const sub = escapeHtml(p.thumbSub);
+
+      return `
+        <svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sample video thumbnail: ${label}">
+          <defs>
+            <linearGradient id="bg-${label.replace(/[^a-z0-9]/gi, '')}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="${c1}" />
+              <stop offset="100%" stop-color="${c2}" />
+            </linearGradient>
+          </defs>
+          <rect width="640" height="360" fill="url(#bg-${label.replace(/[^a-z0-9]/gi, '')})" />
+          <circle cx="520" cy="86" r="110" fill="${accent}" opacity="0.14" />
+          <circle cx="110" cy="310" r="95" fill="#ffffff" opacity="0.06" />
+          <rect x="44" y="42" width="136" height="28" rx="4" fill="rgba(0,0,0,0.45)" />
+          <text x="58" y="61" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="13" font-weight="700" fill="${accent}" letter-spacing="1.2">${sub}</text>
+          <text x="44" y="210" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="56" font-weight="800" fill="#ffffff" letter-spacing="-1.5">${label}</text>
+          <rect x="44" y="236" width="180" height="6" rx="3" fill="${accent}" />
+          <rect x="44" y="264" width="260" height="12" rx="4" fill="#ffffff" opacity="0.22" />
+          <rect x="44" y="286" width="180" height="12" rx="4" fill="#ffffff" opacity="0.14" />
+        </svg>
+      `;
+    }
+
+    /**
+     * Validates and sanitizes an array of saved title pairs from localStorage.
+     */
+    function sanitizeSavedPairs(raw) {
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .filter((item) => item && typeof item === 'object' && (typeof item.titleA === 'string' || typeof item.titleB === 'string'))
+        .slice(0, MAX_SAVED_PAIRS)
+        .map((item) => ({
+          id: String(item.id || Date.now()),
+          titleA: String(item.titleA || '').slice(0, 120),
+          titleB: String(item.titleB || '').slice(0, 120),
+          winner: item.winner === 'B' ? 'B' : 'A',
+          channel: String(item.channel || '').slice(0, 60),
+          subscribers: String(item.subscribers || '').slice(0, 32),
+          views: String(item.views || '').slice(0, 24),
+          uploadTime: String(item.uploadTime || '').slice(0, 24),
+          savedAt: String(item.savedAt || '')
+        }));
+    }
+
+    /**
+     * Strips any Vite dev-server client script tag so downloaded HTML is 100% standalone.
+     */
+    function stripDevClientScript(html) {
+      return String(html || '').replace(/<script[^>]*\/@vite\/client[^>]*><\/script>\s*/gi, '');
+    }
+
+    /* ========================================================================
+       BROWSER UI CONTROLLER (Guarded so pure functions can be tested in Node)
+       ======================================================================== */
+    if (typeof document !== 'undefined') {
+      (function initApp() {
+        // Sync canonical & og:url dynamically to current origin + pathname when hosted
+        try {
+          if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+            const currentUrl = window.location.origin + window.location.pathname;
+            const canonical = document.getElementById('canonical-link');
+            const ogUrl = document.getElementById('og-url-meta');
+            if (canonical) canonical.setAttribute('href', currentUrl);
+            if (ogUrl) ogUrl.setAttribute('content', currentUrl);
+          }
+        } catch (_err) {
+          // Ignore if blocked in restricted iframe contexts
+        }
+
+        // Application State
+        let presetIndex = 0;
+        const state = {
+          titleA: SAMPLE_PRESETS[0].titleA,
+          titleB: SAMPLE_PRESETS[0].titleB,
+          winner: 'A',
+          channel: SAMPLE_PRESETS[0].channel,
+          subscribers: SAMPLE_PRESETS[0].subscribers,
+          views: SAMPLE_PRESETS[0].views,
+          uploadTime: SAMPLE_PRESETS[0].uploadTime,
+          duration: SAMPLE_PRESETS[0].duration,
+          snippet: SAMPLE_PRESETS[0].snippet,
+          viewMode: 'desktop',
+          theme: 'dark',
+          customThumbDataUrl: null,
+          savedPairs: []
+        };
+
+        // DOM References
+        const els = {
+          inputA: document.getElementById('input-title-a'),
+          inputB: document.getElementById('input-title-b'),
+          panelA: document.getElementById('panel-a'),
+          panelB: document.getElementById('panel-b'),
+          pickABtn: document.getElementById('pick-a-btn'),
+          pickBBtn: document.getElementById('pick-b-btn'),
+          winnerTagA: document.getElementById('winner-tag-a'),
+          winnerTagB: document.getElementById('winner-tag-b'),
+          charsA: document.getElementById('chars-a'),
+          wordsA: document.getElementById('words-a'),
+          statusA: document.getElementById('status-a'),
+          cutoffA: document.getElementById('cutoff-a'),
+          powerA: document.getElementById('power-a'),
+          checksA: document.getElementById('checks-a'),
+          charsB: document.getElementById('chars-b'),
+          wordsB: document.getElementById('words-b'),
+          statusB: document.getElementById('status-b'),
+          cutoffB: document.getElementById('cutoff-b'),
+          powerB: document.getElementById('power-b'),
+          checksB: document.getElementById('checks-b'),
+          inputChannel: document.getElementById('input-channel'),
+          inputSubs: document.getElementById('input-subs'),
+          inputViews: document.getElementById('input-views'),
+          inputTime: document.getElementById('input-time'),
+          inputThumb: document.getElementById('input-thumb'),
+          thumbUploadLabel: document.getElementById('thumb-upload-label'),
+          resetThumbBtn: document.getElementById('reset-thumb-btn'),
+          previewStage: document.getElementById('preview-stage'),
+          stageHeading: document.getElementById('stage-heading'),
+          stageNote: document.getElementById('stage-note'),
+          thumbSlotA: document.getElementById('thumb-slot-a'),
+          thumbSlotB: document.getElementById('thumb-slot-b'),
+          avatarA: document.getElementById('avatar-a'),
+          avatarB: document.getElementById('avatar-b'),
+          avatarSearchA: document.getElementById('avatar-search-a'),
+          avatarSearchB: document.getElementById('avatar-search-b'),
+          previewTitleA: document.getElementById('preview-title-a'),
+          previewTitleB: document.getElementById('preview-title-b'),
+          previewChannelA: document.getElementById('preview-channel-a'),
+          previewChannelB: document.getElementById('preview-channel-b'),
+          previewSearchChannelA: document.getElementById('preview-search-channel-a'),
+          previewSearchChannelB: document.getElementById('preview-search-channel-b'),
+          previewStatsA: document.getElementById('preview-stats-a'),
+          previewStatsB: document.getElementById('preview-stats-b'),
+          previewSnippetA: document.getElementById('preview-snippet-a'),
+          previewSnippetB: document.getElementById('preview-snippet-b'),
+          previewWinnerA: document.getElementById('preview-winner-a'),
+          previewWinnerB: document.getElementById('preview-winner-b'),
+          swapBtn: document.getElementById('swap-btn'),
+          savePairBtn: document.getElementById('save-pair-btn'),
+          copyWinnerBtn: document.getElementById('copy-winner-btn'),
+          headerSampleBtn: document.getElementById('header-sample-btn'),
+          stageSampleBtn: document.getElementById('stage-sample-btn'),
+          actionStatus: document.getElementById('action-status'),
+          savedListContainer: document.getElementById('saved-list-container'),
+          clearSavedBtn: document.getElementById('clear-saved-btn'),
+          viewBtns: Array.from(document.querySelectorAll('[data-view-btn]')),
+          themeBtns: Array.from(document.querySelectorAll('[data-theme-btn]'))
+        };
+
+        // Load saved pairs and theme from localStorage
+        function loadPersistence() {
+          try {
+            const storedPairs = localStorage.getItem(STORAGE_KEY);
+            if (storedPairs) {
+              state.savedPairs = sanitizeSavedPairs(JSON.parse(storedPairs));
+            }
+            const storedTheme = localStorage.getItem(THEME_KEY);
+            if (storedTheme === 'light' || storedTheme === 'dark') {
+              state.theme = storedTheme;
+            }
+          } catch (_err) {
+            state.savedPairs = [];
+          }
+        }
+
+        function persistPairs() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.savedPairs));
+          } catch (_err) {
+            // Storage quota or private browsing restriction
+          }
+        }
+
+        function setStatusMessage(msg, isConfirmed) {
+          els.actionStatus.textContent = msg;
+          els.actionStatus.classList.toggle('is-confirmed', Boolean(isConfirmed));
+        }
+
+        function renderAnalysis(variantKey, titleValue) {
+          const info = analyzeTitle(titleValue);
+          const isA = variantKey === 'A';
+
+          const charsEl = isA ? els.charsA : els.charsB;
+          const wordsEl = isA ? els.wordsA : els.wordsB;
+          const statusEl = isA ? els.statusA : els.statusB;
+          const cutoffEl = isA ? els.cutoffA : els.cutoffB;
+          const powerEl = isA ? els.powerA : els.powerB;
+          const checksEl = isA ? els.checksA : els.checksB;
+
+          charsEl.textContent = String(info.charCount);
+          wordsEl.textContent = String(info.wordCount);
+          statusEl.textContent = info.label;
+          statusEl.className = 'truncation-status ' + info.level;
+
+          if (!info.text) {
+            cutoffEl.innerHTML = '<span style="color: var(--text-muted);">Start typing above to preview where mobile (55) and desktop (68) cut off.</span>';
+          } else {
+            let html = escapeHtml(info.safePart);
+            if (info.mobileRiskPart) {
+              html += '<span class="zone-mobile-risk" title="Risk of mobile truncation">' + escapeHtml(info.mobileRiskPart) + '</span>';
+            }
+            if (info.desktopCutPart) {
+              html += '<span class="zone-desktop-cut" title="Likely hidden behind ellipsis on desktop & mobile">' + escapeHtml(info.desktopCutPart) + '</span>';
+            }
+            cutoffEl.innerHTML = html;
+          }
+
+          if (info.powerWords.length > 0) {
+            const hits = info.powerWords
+              .map((w) => '<span class="power-word-hit">' + escapeHtml(w) + '</span>')
+              .join(', ');
+            powerEl.innerHTML = '<span>Hook words spotted:</span> ' + hits;
+          } else {
+            powerEl.innerHTML = '<span>Hook words spotted:</span> <span style="color: var(--text-muted);">None yet (try words like &ldquo;Why&rdquo;, &ldquo;Tested&rdquo;, &ldquo;Honest&rdquo;, or &ldquo;Mistake&rdquo;)</span>';
+          }
+
+          const checkDefs = [
+            { pass: info.checks.frontLoaded, text: 'Under 68 chars' },
+            { pass: info.checks.hasNumber, text: 'Specific number' },
+            { pass: info.checks.hasPowerWord, text: 'Curiosity / tension word' },
+            { pass: info.checks.noCapsSpam, text: 'Readable casing' }
+          ];
+
+          checksEl.innerHTML = checkDefs
+            .map((c) => (
+              '<span class="check-item' + (c.pass ? ' is-pass' : '') + '">' +
+                '<span class="check-mark" aria-hidden="true">' + (c.pass ? '✓' : '·') + '</span>' +
+                '<span>' + c.text + '</span>' +
+              '</span>'
+            ))
+            .join('');
+        }
+
+        function renderThumbnails() {
+          const preset = SAMPLE_PRESETS[presetIndex];
+          const durationHtml = '<span class="yt-duration">' + escapeHtml(state.duration) + '</span>';
+
+          let mediaHtml = '';
+          if (state.customThumbDataUrl) {
+            mediaHtml = '<img src="' + state.customThumbDataUrl + '" alt="Custom uploaded video thumbnail preview" />';
+            els.resetThumbBtn.hidden = false;
+            els.thumbUploadLabel.textContent = 'Change thumbnail';
+          } else {
+            mediaHtml = buildFallbackThumbnailSvg(preset);
+            els.resetThumbBtn.hidden = true;
+            els.thumbUploadLabel.textContent = 'Upload thumbnail';
+          }
+
+          els.thumbSlotA.innerHTML = mediaHtml + durationHtml;
+          els.thumbSlotB.innerHTML = mediaHtml + durationHtml;
+        }
+
+        function renderPreviewStage() {
+          els.previewStage.setAttribute('data-view', state.viewMode);
+
+          const subsText = state.subscribers.trim() || '148K subscribers';
+          const channelText = state.channel.trim() || 'Your Channel';
+          const viewsText = state.views.trim() || '42K views';
+          const timeText = state.uploadTime.trim() || '2 hours ago';
+          const initials = getChannelInitials(channelText);
+
+          if (state.viewMode === 'desktop') {
+            els.stageHeading.textContent = 'Desktop Home Feed Preview';
+            els.stageNote.textContent = 'Realistic 2-line YouTube browse grid · ' + subsText;
+          } else if (state.viewMode === 'mobile') {
+            els.stageHeading.textContent = 'Mobile App Feed Preview';
+            els.stageNote.textContent = 'Narrow phone card width (tighter 2-line wrap) · ' + subsText;
+          } else {
+            els.stageHeading.textContent = 'Search & Up-Next Row Preview';
+            els.stageNote.textContent = 'Horizontal YouTube search result row · ' + subsText;
+          }
+
+          els.avatarA.textContent = initials;
+          els.avatarB.textContent = initials;
+          els.avatarSearchA.textContent = initials;
+          els.avatarSearchB.textContent = initials;
+
+          const titleAText = state.titleA.trim();
+          const titleBText = state.titleB.trim();
+
+          els.previewTitleA.textContent = titleAText || 'Enter Title A above to preview it here';
+          els.previewTitleA.classList.toggle('is-placeholder', !titleAText);
+
+          els.previewTitleB.textContent = titleBText || 'Enter Title B above to preview it here';
+          els.previewTitleB.classList.toggle('is-placeholder', !titleBText);
+
+          els.previewChannelA.textContent = channelText;
+          els.previewChannelB.textContent = channelText;
+          els.previewSearchChannelA.textContent = channelText + ' · ' + subsText;
+          els.previewSearchChannelB.textContent = channelText + ' · ' + subsText;
+
+          const statsCombined = state.viewMode === 'mobile'
+            ? channelText + ' · ' + viewsText + ' · ' + timeText
+            : viewsText + ' · ' + timeText;
+
+          els.previewStatsA.textContent = statsCombined;
+          els.previewStatsB.textContent = statsCombined;
+          els.previewChannelA.hidden = state.viewMode === 'mobile';
+          els.previewChannelB.hidden = state.viewMode === 'mobile';
+
+          els.previewSnippetA.textContent = state.snippet;
+          els.previewSnippetB.textContent = state.snippet;
+
+          renderThumbnails();
+        }
+
+        function renderWinnerSelection() {
+          const isA = state.winner === 'A';
+          els.panelA.classList.toggle('is-winner', isA);
+          els.panelB.classList.toggle('is-winner', !isA);
+          els.pickABtn.setAttribute('aria-pressed', String(isA));
+          els.pickBBtn.setAttribute('aria-pressed', String(!isA));
+          els.winnerTagA.hidden = !isA;
+          els.winnerTagB.hidden = isA;
+          els.previewWinnerA.hidden = !isA;
+          els.previewWinnerB.hidden = isA;
+          els.copyWinnerBtn.textContent = 'Copy Winner (' + state.winner + ')';
+        }
+
+        function renderTheme() {
+          document.documentElement.setAttribute('data-theme', state.theme);
+          els.themeBtns.forEach((btn) => {
+            btn.setAttribute('aria-pressed', String(btn.dataset.themeBtn === state.theme));
+          });
+        }
+
+        function renderViewButtons() {
+          els.viewBtns.forEach((btn) => {
+            btn.setAttribute('aria-pressed', String(btn.dataset.viewBtn === state.viewMode));
+          });
+        }
+
+        function renderSavedPairs() {
+          els.clearSavedBtn.hidden = state.savedPairs.length === 0;
+
+          if (state.savedPairs.length === 0) {
+            els.savedListContainer.innerHTML = `
+              <div class="empty-state">
+                <p>No title pairs saved yet. Click <strong>Save Pair</strong> above whenever you want to keep a test for upload day.</p>
+                <button type="button" class="btn btn-sm" id="empty-save-btn">Save Current Pair</button>
+              </div>
+            `;
+            const emptyBtn = document.getElementById('empty-save-btn');
+            if (emptyBtn) emptyBtn.addEventListener('click', handleSavePair);
+            return;
+          }
+
+          const rowsHtml = state.savedPairs
+            .map((pair, idx) => {
+              const titleADisplay = pair.titleA ? escapeHtml(pair.titleA) : '<em>(Empty)</em>';
+              const titleBDisplay = pair.titleB ? escapeHtml(pair.titleB) : '<em>(Empty)</em>';
+              const metaParts = [
+                'Winner: ' + pair.winner,
+                pair.channel || 'Your Channel',
+                pair.savedAt || 'Saved'
+              ];
+              return `
+                <div class="saved-item">
+                  <div>
+                    <div class="saved-titles">
+                      <div class="saved-variant"><strong>A:</strong>${titleADisplay}</div>
+                      <div class="saved-variant"><strong>B:</strong>${titleBDisplay}</div>
+                    </div>
+                    <div class="saved-meta">
+                      ${metaParts.map((m) => '<span>' + escapeHtml(m) + '</span>').join('<span aria-hidden="true">&middot;</span>')}
+                    </div>
+                  </div>
+                  <div class="saved-item-actions">
+                    <button type="button" class="btn btn-sm" data-load-pair="${idx}" aria-label="Load saved pair ${idx + 1}">Load</button>
+                    <button type="button" class="btn btn-subtle btn-sm" data-delete-pair="${idx}" aria-label="Delete saved pair ${idx + 1}">Delete</button>
+                  </div>
+                </div>
+              `;
+            })
+            .join('');
+
+          els.savedListContainer.innerHTML = '<div class="saved-list">' + rowsHtml + '</div>';
+
+          els.savedListContainer.querySelectorAll('[data-load-pair]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const idx = Number(btn.getAttribute('data-load-pair'));
+              const target = state.savedPairs[idx];
+              if (!target) return;
+              state.titleA = target.titleA;
+              state.titleB = target.titleB;
+              state.winner = target.winner;
+              if (target.channel) state.channel = target.channel;
+              if (target.subscribers) state.subscribers = target.subscribers;
+              if (target.views) state.views = target.views;
+              if (target.uploadTime) state.uploadTime = target.uploadTime;
+              syncInputsFromState();
+              renderAll();
+              setStatusMessage('Loaded saved test pair into the previewer.', true);
+              document.getElementById('previewer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          });
+
+          els.savedListContainer.querySelectorAll('[data-delete-pair]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const idx = Number(btn.getAttribute('data-delete-pair'));
+              state.savedPairs.splice(idx, 1);
+              persistPairs();
+              renderSavedPairs();
+              setStatusMessage('Removed saved pair from browser history.', false);
+            });
+          });
+        }
+
+        function syncInputsFromState() {
+          els.inputA.value = state.titleA;
+          els.inputB.value = state.titleB;
+          els.inputChannel.value = state.channel;
+          els.inputSubs.value = state.subscribers;
+          els.inputViews.value = state.views;
+          els.inputTime.value = state.uploadTime;
+        }
+
+        function renderAll() {
+          renderTheme();
+          renderViewButtons();
+          renderWinnerSelection();
+          renderAnalysis('A', state.titleA);
+          renderAnalysis('B', state.titleB);
+          renderPreviewStage();
+          renderSavedPairs();
+        }
+
+        // Action Handlers
+        function handleSavePair() {
+          const a = state.titleA.trim();
+          const b = state.titleB.trim();
+          if (!a && !b) {
+            setStatusMessage('Enter at least one title before saving a test pair.', false);
+            els.inputA.focus();
+            return;
+          }
+          const now = new Date();
+          const formattedDate = now.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+          });
+          const entry = {
+            id: String(Date.now()),
+            titleA: a,
+            titleB: b,
+            winner: state.winner,
+            channel: state.channel.trim(),
+            subscribers: state.subscribers.trim(),
+            views: state.views.trim(),
+            uploadTime: state.uploadTime.trim(),
+            savedAt: formattedDate
+          };
+          state.savedPairs = [entry, ...state.savedPairs].slice(0, MAX_SAVED_PAIRS);
+          persistPairs();
+          renderSavedPairs();
+          setStatusMessage('Saved pair to browser history (' + state.savedPairs.length + ' total).', true);
+        }
+
+        function handleLoadNextSample() {
+          presetIndex = (presetIndex + 1) % SAMPLE_PRESETS.length;
+          const sample = SAMPLE_PRESETS[presetIndex];
+          state.titleA = sample.titleA;
+          state.titleB = sample.titleB;
+          state.channel = sample.channel;
+          state.subscribers = sample.subscribers;
+          state.views = sample.views;
+          state.uploadTime = sample.uploadTime;
+          state.duration = sample.duration;
+          state.snippet = sample.snippet;
+          state.winner = 'A';
+          syncInputsFromState();
+          renderAll();
+          setStatusMessage('Loaded "' + sample.niche + '" sample test.', true);
+        }
+
+        async function handleCopyWinner() {
+          const winnerText = (state.winner === 'A' ? state.titleA : state.titleB).trim();
+          if (!winnerText) {
+            setStatusMessage('Title ' + state.winner + ' is empty — write a title first before copying.', false);
+            return;
+          }
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(winnerText);
+            } else {
+              const temp = document.createElement('textarea');
+              temp.value = winnerText;
+              temp.setAttribute('readonly', '');
+              temp.style.position = 'fixed';
+              temp.style.opacity = '0';
+              document.body.appendChild(temp);
+              temp.select();
+              document.execCommand('copy');
+              document.body.removeChild(temp);
+            }
+            const originalLabel = 'Copy Winner (' + state.winner + ')';
+            els.copyWinnerBtn.textContent = 'Copied Title ' + state.winner;
+            setStatusMessage('Copied Title ' + state.winner + ' to your clipboard.', true);
+            window.setTimeout(() => {
+              els.copyWinnerBtn.textContent = originalLabel;
+            }, 1800);
+          } catch (_err) {
+            setStatusMessage('Clipboard access was blocked by the browser. Select the text manually to copy.', false);
+          }
+        }
+
+        // Event Bindings
+        els.inputA.addEventListener('input', (e) => {
+          state.titleA = e.target.value;
+          renderAnalysis('A', state.titleA);
+          renderPreviewStage();
+        });
+
+        els.inputB.addEventListener('input', (e) => {
+          state.titleB = e.target.value;
+          renderAnalysis('B', state.titleB);
+          renderPreviewStage();
+        });
+
+        els.inputChannel.addEventListener('input', (e) => {
+          state.channel = e.target.value;
+          renderPreviewStage();
+        });
+
+        els.inputSubs.addEventListener('input', (e) => {
+          state.subscribers = e.target.value;
+          renderPreviewStage();
+        });
+
+        els.inputViews.addEventListener('input', (e) => {
+          state.views = e.target.value;
+          renderPreviewStage();
+        });
+
+        els.inputTime.addEventListener('input', (e) => {
+          state.uploadTime = e.target.value;
+          renderPreviewStage();
+        });
+
+        els.pickABtn.addEventListener('click', () => {
+          state.winner = 'A';
+          renderWinnerSelection();
+          setStatusMessage('Marked Title A as your current winner.', false);
+        });
+
+        els.pickBBtn.addEventListener('click', () => {
+          state.winner = 'B';
+          renderWinnerSelection();
+          setStatusMessage('Marked Title B as your current winner.', false);
+        });
+
+        els.swapBtn.addEventListener('click', () => {
+          const prevA = state.titleA;
+          state.titleA = state.titleB;
+          state.titleB = prevA;
+          state.winner = state.winner === 'A' ? 'B' : 'A';
+          syncInputsFromState();
+          renderAll();
+          setStatusMessage('Swapped Title A and Title B.', false);
+        });
+
+        els.savePairBtn.addEventListener('click', handleSavePair);
+        els.copyWinnerBtn.addEventListener('click', handleCopyWinner);
+        els.headerSampleBtn.addEventListener('click', handleLoadNextSample);
+        els.stageSampleBtn.addEventListener('click', handleLoadNextSample);
+
+        els.viewBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.viewMode = btn.dataset.viewBtn || 'desktop';
+            renderViewButtons();
+            renderPreviewStage();
+          });
+        });
+
+        els.themeBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.theme = btn.dataset.themeBtn === 'light' ? 'light' : 'dark';
+            try {
+              localStorage.setItem(THEME_KEY, state.theme);
+            } catch (_err) {
+              // Ignore storage error
+            }
+            renderTheme();
+          });
+        });
+
+        els.inputThumb.addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          if (!file.type.startsWith('image/')) {
+            setStatusMessage('Please pick a PNG, JPG, or WebP image file.', false);
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (loadEvent) => {
+            state.customThumbDataUrl = String(loadEvent.target && loadEvent.target.result || '');
+            renderThumbnails();
+            setStatusMessage('Loaded "' + file.name + '" locally for both A & B cards.', true);
+          };
+          reader.onerror = () => {
+            setStatusMessage('Could not read that image file. Try another PNG or JPG.', false);
+          };
+          reader.readAsDataURL(file);
+        });
+
+        els.resetThumbBtn.addEventListener('click', () => {
+          state.customThumbDataUrl = null;
+          els.inputThumb.value = '';
+          renderThumbnails();
+          setStatusMessage('Switched back to the built-in sample thumbnail.', false);
+        });
+
+        els.clearSavedBtn.addEventListener('click', () => {
+          state.savedPairs = [];
+          persistPairs();
+          renderSavedPairs();
+          setStatusMessage('Cleared all saved title pairs from this browser.', false);
+        });
+
+        const downloadHtmlBtn = document.getElementById('download-html-btn');
+        if (downloadHtmlBtn) {
+          downloadHtmlBtn.addEventListener('click', async () => {
+            try {
+              let rawHtml = '';
+              if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                const res = await fetch(window.location.pathname || './index.html', { cache: 'no-store' });
+                if (res.ok) {
+                  rawHtml = stripDevClientScript(await res.text());
+                }
+              }
+              if (!rawHtml) {
+                rawHtml = stripDevClientScript('<!doctype html>\n' + document.documentElement.outerHTML);
+              }
+              const blob = new Blob([rawHtml], { type: 'text/html;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = 'youtube-title-preview-tool.html';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+              setStatusMessage('Downloaded standalone youtube-title-preview-tool.html file.', true);
+            } catch (_err) {
+              setStatusMessage('Could not start download. Save index.html directly from the project files.', false);
+            }
+          });
+        }
+
+        // Initial Boot
+        loadPersistence();
+        syncInputsFromState();
+        renderAll();
+      })();
+    }
+  </script>
+</body>
+</html>
